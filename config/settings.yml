@@ -1,0 +1,9 @@
+plugins:
+  game_compendium_enabled:
+    default: true
+    client: true
+  game_compendium_asset_manager_groups:
+    type: group_list
+    list_type: compact
+    default: "1|2"
+    client: false

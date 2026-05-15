@@ -1,0 +1,880 @@
+// Game compendium — asset/term reference styles
+:root {
+  --game-compendium-accent-bg: var(--tertiary-very-low);
+  --game-compendium-accent-bg-hover: var(--tertiary-low);
+  --game-compendium-accent-fg: var(--tertiary-hover);
+  --game-compendium-accent-fg-hover: var(--tertiary-hover);
+  --game-compendium-accent-border: var(--tertiary-medium);
+  --game-compendium-panel-bg: var(--secondary);
+  --game-compendium-panel-fg: var(--primary);
+  --game-compendium-panel-fg-muted: var(--primary-medium);
+  --game-compendium-panel-border: var(--primary-low-mid);
+  --game-compendium-panel-row-hover: var(--tertiary-very-low);
+  --game-compendium-description-bg: var(--primary-very-low);
+  --game-compendium-description-fg: var(--primary);
+  --game-compendium-description-border: var(--primary-low-mid);
+  --game-compendium-term-bg: var(--primary-very-low);
+  --game-compendium-term-bg-hover: var(--primary-low);
+  --game-compendium-term-fg: var(--primary-high);
+  --game-compendium-term-fg-hover: var(--primary);
+  --game-compendium-term-border: var(--primary-low-mid);
+  --game-compendium-shadow-soft: 0 4px 20px rgb(var(--always-black-rgb) / 0.18);
+  --game-compendium-shadow-floating: 0 18px 34px rgb(var(--always-black-rgb) / 0.22);
+  --game-compendium-shadow-strong: var(--shadow-modal);
+}
+
+// ------------------------------------------------------------------
+// Inline pill base
+// ------------------------------------------------------------------
+.game-compendium-ref {
+  position: relative;
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 4px;
+  cursor: help;
+  font-size: 0.85em;
+  font-weight: 600;
+  line-height: 1.7;
+  vertical-align: baseline;
+  white-space: nowrap;
+  outline: none;
+}
+
+// ------------------------------------------------------------------
+// Card ref — accent-colored inline asset reference
+// ------------------------------------------------------------------
+.game-compendium-card-ref {
+  background: var(--game-compendium-accent-bg);
+  color: var(--game-compendium-accent-fg);
+  border: 1px solid var(--game-compendium-accent-border);
+
+  &:hover,
+  &:focus {
+    background: var(--game-compendium-accent-bg-hover);
+    border-color: var(--game-compendium-accent-border);
+    color: var(--game-compendium-accent-fg-hover);
+  }
+}
+
+// ------------------------------------------------------------------
+// Term ref — muted inline rules reference
+// ------------------------------------------------------------------
+.game-compendium-term-ref {
+  background: var(--game-compendium-term-bg);
+  color: var(--game-compendium-term-fg);
+  border: 1px solid var(--game-compendium-term-border);
+
+  &:hover,
+  &:focus {
+    background: var(--game-compendium-term-bg-hover);
+    border-color: var(--game-compendium-accent-border);
+    color: var(--game-compendium-term-fg-hover);
+  }
+}
+
+// ------------------------------------------------------------------
+// Tooltips — shared
+// ------------------------------------------------------------------
+.game-compendium-preview,
+.game-compendium-term-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: none;
+
+  @media (width <= 480px) {
+    left: 0;
+    transform: none;
+  }
+}
+
+// ------------------------------------------------------------------
+// Card preview tooltip (image)
+// ------------------------------------------------------------------
+.game-compendium-preview {
+  img {
+    display: block;
+    max-width: 400px;
+    width: auto;
+    border-radius: 8px;
+    box-shadow: var(--game-compendium-shadow-soft);
+    border: 2px solid var(--game-compendium-accent-border);
+
+    @media (width <= 480px) {
+      max-width: 300px;
+    }
+  }
+}
+
+// ------------------------------------------------------------------
+// Term tooltip (text)
+// ------------------------------------------------------------------
+.game-compendium-term-tooltip {
+  min-width: 180px;
+  max-width: 260px;
+  background: var(--game-compendium-panel-bg);
+  border: 1px solid var(--game-compendium-term-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  box-shadow: var(--game-compendium-shadow-soft);
+  color: var(--game-compendium-panel-fg);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  white-space: normal;
+  text-align: left;
+
+  strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--game-compendium-term-fg);
+    font-size: 0.9rem;
+  }
+
+  span {
+    display: block;
+  }
+}
+
+// ------------------------------------------------------------------
+// Block card embed
+// ------------------------------------------------------------------
+.game-compendium-card-block {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 300px;
+  margin: 1em 0;
+  cursor: default;
+
+  img {
+    display: block;
+    max-width: 300px;
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+
+    @media (width <= 576px) {
+      max-width: 100%;
+    }
+  }
+}
+
+// JS portal tooltip — appended to document.body to avoid overflow clipping
+.game-compendium-hover-portal {
+  position: fixed;
+  z-index: 2147483000;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.game-compendium-hover-portal[hidden] {
+  display: none !important; // stylelint-disable-line declaration-no-important
+}
+
+.game-compendium-hover-portal--card {
+  width: min(300px, calc(100vw - 16px));
+}
+
+.game-compendium-hover-portal--card img {
+  display: block;
+  width: 100%;
+  max-height: calc(100vh - 16px);
+  object-fit: contain;
+  border-radius: 12px;
+  filter: drop-shadow(0 18px 34px rgb(var(--always-black-rgb) / 0.22));
+}
+
+.game-compendium-hover-portal__card-description {
+  box-sizing: border-box;
+  max-width: min(300px, calc(100vw - 16px));
+  padding: 10px 12px;
+  border: 1px solid var(--game-compendium-description-border);
+  border-radius: 8px;
+  background: var(--game-compendium-description-bg);
+  box-shadow: var(--game-compendium-shadow-soft);
+  color: var(--game-compendium-description-fg);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.game-compendium-hover-portal--card .game-compendium-hover-portal__card-description {
+  margin-top: 8px;
+}
+
+.game-compendium-hover-portal--term {
+  max-width: min(340px, calc(100vw - 16px));
+  background: var(--game-compendium-panel-bg);
+  border: 1px solid var(--game-compendium-term-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: var(--game-compendium-shadow-floating);
+  color: var(--game-compendium-panel-fg);
+  font-size: 0.95rem;
+  line-height: 1.42;
+}
+
+.game-compendium-hover-portal--term .game-compendium-term-tooltip {
+  display: block;
+  position: static;
+  transform: none;
+  min-width: 0;
+  max-width: none;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.game-compendium-rich-card-ref,
+.game-compendium-rich-term-ref,
+.game-compendium-rich-card-block {
+  user-select: all;
+}
+
+.ProseMirror .game-compendium-card-ref,
+.d-editor-input .game-compendium-card-ref {
+  box-shadow: inset 0 0 0 1px rgb(var(--tertiary-rgb) / 0.22);
+}
+
+@media (width <= 640px) {
+  .game-compendium-hover-portal--card {
+    width: min(280px, calc(100vw - 16px));
+  }
+}
+
+// ProseMirror inline decorations for [[Card Name]] text in rich editor
+.game-compendium-pm-card-ref {
+  background: var(--game-compendium-accent-bg);
+  color: var(--game-compendium-accent-fg);
+  border: 1px solid var(--game-compendium-accent-border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.85em;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.game-compendium-pm-block-ref {
+  background: var(--game-compendium-term-bg);
+  color: var(--game-compendium-term-fg);
+  border: 1px solid var(--game-compendium-term-border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.85em;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: default;
+  font-style: italic;
+}
+
+.game-compendium-autocomplete-portal {
+  position: fixed;
+  z-index: 2147483001;
+  width: min(280px, calc(100vw - 16px));
+  max-height: min(420px, calc(100vh - 16px));
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: 1px solid var(--game-compendium-panel-border);
+  border-radius: 10px;
+  background: var(--game-compendium-panel-bg);
+  box-shadow: var(--game-compendium-shadow-floating);
+  color: var(--game-compendium-panel-fg);
+  padding: 6px;
+}
+
+.game-compendium-autocomplete-portal[hidden] {
+  display: none !important; // stylelint-disable-line declaration-no-important
+}
+
+.game-compendium-autocomplete-header {
+  padding: 6px 8px 8px;
+  color: var(--game-compendium-accent-fg);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.game-compendium-autocomplete-row,
+.game-compendium-card-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.game-compendium-autocomplete-row:hover,
+.game-compendium-autocomplete-row.is-selected,
+.game-compendium-card-picker-row:hover,
+.game-compendium-card-picker-row.is-selected {
+  background: var(--game-compendium-panel-row-hover);
+}
+
+.game-compendium-autocomplete-row img,
+.game-compendium-card-picker-row img {
+  width: 38px;
+  height: 50px;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 4px;
+}
+
+.game-compendium-autocomplete-row strong,
+.game-compendium-card-picker-row strong {
+  display: block;
+  color: var(--game-compendium-panel-fg);
+}
+
+.game-compendium-autocomplete-row small,
+.game-compendium-card-picker-row small {
+  display: block;
+  color: var(--game-compendium-panel-fg-muted);
+  font-size: 0.75rem;
+}
+
+.game-compendium-autocomplete-empty {
+  padding: 10px;
+  color: var(--game-compendium-panel-fg-muted);
+}
+
+.game-compendium-card-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483002;
+  display: grid;
+  place-items: start center;
+  padding-top: 10vh;
+  background: rgb(var(--always-black-rgb) / 0.35);
+}
+
+.game-compendium-card-picker {
+  width: min(560px, calc(100vw - 24px));
+  max-height: min(720px, calc(100vh - 24px));
+  overflow: hidden;
+  border: 1px solid var(--game-compendium-panel-border);
+  border-radius: 14px;
+  background: var(--game-compendium-panel-bg);
+  box-shadow: var(--game-compendium-shadow-strong);
+  color: var(--game-compendium-panel-fg);
+  padding: 14px;
+}
+
+.game-compendium-card-picker-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--game-compendium-accent-fg);
+  margin-bottom: 10px;
+}
+
+.game-compendium-card-picker-input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--game-compendium-panel-border);
+  background: var(--secondary);
+  color: var(--primary);
+}
+
+.game-compendium-card-picker-results {
+  margin-top: 10px;
+  max-height: 430px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.game-compendium-card-picker-help {
+  margin-top: 10px;
+  color: var(--game-compendium-panel-fg-muted);
+  font-size: 0.8rem;
+}
+
+// ------------------------------------------------------------------
+// Asset management page
+// ------------------------------------------------------------------
+.game-compendium-assets {
+  h2 {
+    margin-bottom: 8px;
+  }
+}
+
+.game-compendium-intro {
+  color: var(--primary-medium);
+  margin-bottom: 20px;
+}
+
+.game-compendium-tabs,
+.game-compendium-upload-type {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.game-compendium-section {
+  h3 {
+    margin: 0 0 14px;
+  }
+}
+
+.game-compendium-toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  margin-bottom: 14px;
+
+  h3 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+  }
+}
+
+.game-compendium-count {
+  flex: 0 0 auto;
+  font-weight: normal;
+  color: var(--primary-medium);
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+.game-compendium-bulk-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid var(--primary-low);
+  border-radius: 10px;
+  background: var(--primary-very-low);
+}
+
+.game-compendium-bulk-actions--inactive {
+  align-items: flex-start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.game-compendium-bulk-actions--inactive > .btn {
+  width: auto;
+}
+
+.game-compendium-bulk-actions__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.game-compendium-bulk-actions__row--operations {
+  padding-top: 12px;
+  border-top: 1px solid var(--primary-low);
+}
+
+.game-compendium-bulk-actions__selection,
+.game-compendium-bulk-actions__summary,
+.game-compendium-bulk-actions__operations {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.game-compendium-bulk-actions__summary,
+.game-compendium-bulk-actions__operations {
+  justify-content: flex-end;
+}
+
+.game-compendium-bulk-actions__notice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--tertiary-very-low);
+  color: var(--primary-medium);
+  font-size: 0.875rem;
+}
+
+.game-compendium-bulk-actions__notice .btn-link {
+  padding: 0;
+}
+
+.game-compendium-bulk-actions__asset-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.game-compendium-bulk-actions__asset-group {
+  flex: 1 1 360px;
+
+  span {
+    color: var(--primary-medium);
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+}
+
+.game-compendium-bulk-actions select,
+.game-compendium-filter select,
+.game-compendium-filter input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.5em;
+}
+
+.game-compendium-bulk-actions select {
+  max-width: 280px;
+}
+
+.game-compendium-bulk-actions__count {
+  min-width: 0;
+  color: var(--primary-medium);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.game-compendium-bulk-actions .btn {
+  white-space: nowrap;
+}
+
+.game-compendium-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 12px;
+  max-height: 65vh;
+  overflow: auto;
+  padding: 4px 4px 14px;
+  margin-bottom: 14px;
+  border: 1px solid var(--primary-low);
+  border-radius: 8px;
+  background: var(--secondary);
+}
+
+.game-compendium-card-item {
+  position: relative;
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  &:hover,
+  &:focus-within,
+  &.is-selected {
+    border-color: var(--tertiary-medium);
+    background: var(--tertiary-low);
+  }
+}
+
+.game-compendium-card-item__select {
+  position: absolute;
+  z-index: 1;
+  top: 6px;
+  left: 6px;
+  display: flex;
+  margin: 0;
+  padding: 2px;
+  border-radius: 4px;
+  background: var(--secondary);
+  box-shadow: var(--game-compendium-shadow-soft);
+}
+
+.game-compendium-card-item__open {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+
+  img {
+    width: 76px;
+    height: 102px;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 4px;
+    border: 1px solid var(--primary-low);
+    background: transparent;
+  }
+}
+
+.game-compendium-card-slug {
+  font-size: 0.72rem;
+  color: var(--primary-medium);
+  text-align: center;
+  word-break: break-word;
+  max-width: 100%;
+  line-height: 1.15;
+}
+
+.game-compendium-loading {
+  grid-column: 1 / -1;
+  padding: 20px;
+  text-align: center;
+  color: var(--primary-medium);
+}
+
+.game-compendium-upload-panel {
+  max-width: 860px;
+}
+
+.game-compendium-upload {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid var(--primary-low);
+  border-radius: 8px;
+  background: var(--primary-very-low);
+
+  h4 {
+    margin-bottom: 8px;
+  }
+}
+
+.game-compendium-upload-hint {
+  color: var(--primary-medium);
+  font-size: 0.875rem;
+  margin-bottom: 10px;
+}
+
+.game-compendium-status {
+  margin-top: 10px;
+  color: var(--primary-medium);
+  font-style: italic;
+}
+
+.game-compendium-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 0;
+
+  span {
+    color: var(--primary-medium);
+    font-size: 0.875rem;
+  }
+
+  small {
+    color: var(--primary-medium);
+    font-size: 0.8rem;
+  }
+}
+
+.game-compendium-filter--asset-group {
+  max-width: 280px;
+}
+
+.game-compendium-filter--search {
+  max-width: 720px;
+}
+
+.game-compendium-upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.game-compendium-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgb(var(--always-black-rgb) / 0.55);
+  border: 0;
+}
+
+.game-compendium-modal {
+  position: fixed;
+  z-index: 1001;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-columns: minmax(220px, 340px) minmax(360px, 1fr);
+  gap: 28px;
+  width: min(980px, calc(100vw - 96px));
+  max-height: calc(100dvh - 96px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 24px;
+  border-radius: 12px;
+  background: var(--secondary);
+  box-shadow: var(--shadow-modal);
+}
+
+.game-compendium-modal__close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.game-compendium-modal__preview {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--primary-low);
+  border-radius: 8px;
+  background: transparent;
+
+  img {
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+  }
+}
+
+.game-compendium-modal__preview-label {
+  position: absolute;
+  inset: 8px auto auto 8px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: var(--tertiary-low);
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.game-compendium-modal__replacement-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--primary-very-low);
+}
+
+.game-compendium-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  label > span,
+  label > small {
+    color: var(--primary-medium);
+  }
+
+  label > span {
+    font-size: 0.875rem;
+  }
+
+  label > small {
+    font-size: 0.8rem;
+  }
+
+  input:not([type="file"]),
+  select,
+  textarea {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  input:not([type="file"]),
+  select {
+    height: 2.5em;
+  }
+
+  textarea {
+    min-height: 120px;
+  }
+}
+
+.game-compendium-modal__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+@media (width <= 900px) {
+  .game-compendium-bulk-actions__row,
+  .game-compendium-bulk-actions__summary,
+  .game-compendium-bulk-actions__operations {
+    justify-content: flex-start;
+  }
+
+  .game-compendium-bulk-actions__asset-group {
+    flex-basis: 100%;
+  }
+
+  .game-compendium-bulk-actions select {
+    width: 100%;
+  }
+}
+
+@media (width <= 700px) {
+  .game-compendium-modal {
+    grid-template-columns: 1fr;
+    width: calc(100vw - 48px);
+    max-height: calc(100dvh - 48px);
+  }
+}
+
+.game-compendium-card-asset-group {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--primary-low);
+  color: var(--primary-medium);
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+
+.game-compendium-upload textarea {
+  min-height: 86px;
+}
+
+.game-compendium-asset-group-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.game-compendium-asset-group-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--primary-low);
+  border-radius: 8px;
+  background: var(--secondary);
+}

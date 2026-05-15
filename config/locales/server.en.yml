@@ -1,0 +1,4 @@
+en:
+  site_settings:
+    game_compendium_enabled: "Enable Game Compendium (card and term embeds)"
+    game_compendium_asset_manager_groups: "Groups allowed to manage Game Compendium assets"
