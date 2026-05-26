@@ -99,9 +99,10 @@
     display: block;
     max-width: 400px;
     width: auto;
-    border-radius: 8px;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
     box-shadow: var(--game-compendium-shadow-soft);
-    border: 2px solid var(--game-compendium-accent-border);
 
     @media (width <= 480px) {
       max-width: 300px;
@@ -185,7 +186,9 @@
   width: 100%;
   max-height: calc(100vh - 16px);
   object-fit: contain;
-  border-radius: 12px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   filter: drop-shadow(0 18px 34px rgb(var(--always-black-rgb) / 0.22));
 }
 
@@ -414,11 +417,14 @@
   margin-bottom: 20px;
 }
 
-.game-compendium-tabs,
 .game-compendium-upload-type {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+  margin-bottom: 20px;
+}
+
+.game-compendium-tabs {
   margin-bottom: 20px;
 }
 
@@ -641,19 +647,126 @@
 }
 
 .game-compendium-upload-panel {
-  max-width: 860px;
+  max-width: 760px;
 }
 
 .game-compendium-upload {
+  display: grid;
+  gap: 18px;
   margin-top: 20px;
-  padding: 20px;
+  padding: 24px;
   border: 1px solid var(--primary-low);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--primary-very-low);
 
   h4 {
-    margin-bottom: 8px;
+    margin: 0 0 8px;
   }
+}
+
+.game-compendium-upload--batch {
+  background: linear-gradient(180deg, var(--secondary), var(--primary-very-low));
+}
+
+.game-compendium-upload__header {
+  max-width: 620px;
+}
+
+.game-compendium-upload__asset-group {
+  max-width: none;
+
+  select {
+    max-width: 360px;
+  }
+}
+
+.game-compendium-upload__actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.game-compendium-batch-picker {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 32px 28px;
+  border: 2px dashed var(--primary-low-mid);
+  border-radius: 12px;
+  background: var(--secondary);
+  color: var(--primary);
+  cursor: pointer;
+  text-align: center;
+
+  &:hover,
+  &:focus-within,
+  &.is-drag-active {
+    border-color: var(--tertiary-medium);
+    background: var(--tertiary-very-low);
+  }
+
+  input {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.game-compendium-batch-picker__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.game-compendium-batch-picker__hint {
+  max-width: 520px;
+  color: var(--primary-medium);
+  font-size: 0.9rem;
+}
+
+.game-compendium-batch-picker__button {
+  margin-top: 4px;
+}
+
+.game-compendium-batch-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--tertiary-very-low);
+}
+
+.game-compendium-batch-summary__counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  span {
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--secondary);
+    color: var(--primary-medium);
+    font-size: 0.82rem;
+  }
+}
+
+.game-compendium-batch-file-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 6px 12px;
+  max-height: 180px;
+  overflow: auto;
+  margin: 0;
+  padding: 12px 12px 12px 28px;
+  border: 1px solid var(--primary-low);
+  border-radius: 8px;
+  background: var(--secondary);
+  color: var(--primary-medium);
+  font-size: 0.85rem;
 }
 
 .game-compendium-upload-hint {
@@ -695,10 +808,28 @@
 }
 
 .game-compendium-upload-row {
+  --game-compendium-control-height: 2.5rem;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  align-items: center;
+  align-items: flex-start;
+
+  input,
+  select,
+  .btn {
+    box-sizing: border-box;
+    height: var(--game-compendium-control-height);
+    min-height: var(--game-compendium-control-height);
+    margin: 0;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-block: 0;
+    line-height: 1;
+  }
 }
 
 .game-compendium-modal-backdrop {

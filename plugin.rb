@@ -480,6 +480,7 @@ after_initialize do
       UploadCreator.new(
         file,
         "#{slug}.png",
+        for_site_setting: true,
         skip_image_processing: true
       ).create_for(current_user.id)
     end

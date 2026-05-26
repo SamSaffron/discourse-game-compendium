@@ -250,7 +250,7 @@ const extension = {
     },
     game_compendium_card_block(state, node) {
       state.ensureNewLine();
-      state.write(`[[${node.attrs.name}${node.attrs.upgraded ? "+" : ""}]]`);
+      state.write(`[[${node.attrs.name}${node.attrs.upgraded ? "+" : ""}]]\n\n`);
     },
   },
 };

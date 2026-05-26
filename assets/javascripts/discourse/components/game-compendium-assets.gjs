@@ -4,10 +4,10 @@ import { fn } from "@ember/helper";
 import { on } from "@ember/modifier";
 import { action } from "@ember/object";
 import { service } from "@ember/service";
-import DButton from "discourse/components/d-button";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import { eq } from "discourse/truth-helpers";
+import DButton from "discourse/ui-kit/d-button";
 import { i18n } from "discourse-i18n";
 
 const PAGE_SIZE = 60;
@@ -45,6 +45,8 @@ export default class GameCompendiumAssets extends Component {
   @tracked bulkAssetGroup = "";
   @tracked bulkOperating = false;
   @tracked bulkSelectionMode = false;
+  @tracked batchFiles = [];
+  @tracked batchDragActive = false;
   loadSeq = 0;
 
   constructor() {
@@ -95,6 +97,18 @@ export default class GameCompendiumAssets extends Component {
       { slug: "", name: i18n("game_compendium.no_asset_group") },
       ...this.asset_groups,
     ];
+  }
+
+  get hasBatchFiles() {
+    return this.batchFiles.length > 0;
+  }
+
+  get batchPngFileCount() {
+    return this.batchFiles.filter((file) => file.name.toLowerCase().endsWith(".png")).length;
+  }
+
+  get batchTextFileCount() {
+    return this.batchFiles.filter((file) => file.name.toLowerCase().endsWith(".txt")).length;
   }
 
   toast(message) {
@@ -515,33 +529,69 @@ export default class GameCompendiumAssets extends Component {
   }
 
   @action
-  async uploadSingle(event) {
+  selectBatchFiles(event) {
+    this.batchFiles = [...(event.target.files || [])];
+    this.message = "";
+  }
+
+  @action
+  activateBatchDropZone(event) {
     event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-    const succeeded = await this.upload(formData, false);
-    if (succeeded) {
-      form.reset();
+    if (!this.uploading) {
+      this.batchDragActive = true;
+    }
+  }
+
+  @action
+  deactivateBatchDropZone(event) {
+    event.preventDefault();
+    this.batchDragActive = false;
+  }
+
+  @action
+  dropBatchFiles(event) {
+    event.preventDefault();
+    this.batchDragActive = false;
+    if (this.uploading) {
+      return;
+    }
+
+    this.batchFiles = [...(event.dataTransfer?.files || [])];
+    this.message = "";
+    const input = event.currentTarget.querySelector("[name=batch_files]");
+    if (input) {
+      input.value = "";
+    }
+  }
+
+  @action
+  clearBatchFiles(event) {
+    event?.preventDefault();
+    this.batchFiles = [];
+    const input = event?.target?.closest("form")?.querySelector("[name=batch_files]");
+    if (input) {
+      input.value = "";
     }
   }
 
   @action
   async uploadBatch(event) {
-    const form = event.target.form;
-    const files = event.target.files;
-    if (!files.length) {
+    event.preventDefault();
+    if (!this.hasBatchFiles) {
       return;
     }
 
+    const form = event.target;
     const formData = new FormData();
     formData.append("asset_group", form.querySelector("[name=batch_asset_group]")?.value || "");
-    for (const file of files) {
+    for (const file of this.batchFiles) {
       formData.append("files[]", file);
     }
 
     const succeeded = await this.upload(formData, true);
     if (succeeded) {
-      event.target.value = "";
+      form.reset();
+      this.batchFiles = [];
     }
   }
 
@@ -637,10 +687,10 @@ export default class GameCompendiumAssets extends Component {
         {{#if @forbidden}}
           <div class="alert alert-error">{{i18n "game_compendium.forbidden"}}</div>
         {{else}}
-          <ul class="game-compendium-tabs nav-pills nav">
-            <li class={{if (eq this.activeTab "browse") "active"}}><a href="#" {{on "click" (fn this.switchTab "browse")}}>{{i18n "game_compendium.tabs.browse"}}</a></li>
-            <li class={{if (eq this.activeTab "upload") "active"}}><a href="#" {{on "click" (fn this.switchTab "upload")}}>{{i18n "game_compendium.tabs.upload"}}</a></li>
-            <li class={{if (eq this.activeTab "asset_groups") "active"}}><a href="#" {{on "click" (fn this.switchTab "asset_groups")}}>{{i18n "game_compendium.tabs.asset_groups"}}</a></li>
+          <ul class="game-compendium-tabs nav nav-pills">
+            <li><a href="#" class={{if (eq this.activeTab "browse") "active"}} {{on "click" (fn this.switchTab "browse")}}>{{i18n "game_compendium.tabs.browse"}}</a></li>
+            <li><a href="#" class={{if (eq this.activeTab "upload") "active"}} {{on "click" (fn this.switchTab "upload")}}>{{i18n "game_compendium.tabs.upload"}}</a></li>
+            <li><a href="#" class={{if (eq this.activeTab "asset_groups") "active"}} {{on "click" (fn this.switchTab "asset_groups")}}>{{i18n "game_compendium.tabs.asset_groups"}}</a></li>
           </ul>
 
           {{#if (eq this.activeTab "browse")}}
@@ -732,27 +782,47 @@ export default class GameCompendiumAssets extends Component {
           {{#if (eq this.activeTab "upload")}}
             <section class="game-compendium-section game-compendium-upload-panel">
               <h3>{{i18n "game_compendium.upload_assets"}}</h3>
-              <form class="game-compendium-upload" {{on "submit" this.uploadSingle}}>
-                <h4>{{i18n "game_compendium.upload_one_asset"}}</h4>
-                <p class="game-compendium-upload-hint">{{i18n "game_compendium.upload_hint"}}</p>
-                <div class="game-compendium-upload-row">
-                  <input name="slug" type="text" placeholder={{i18n "game_compendium.slug_placeholder"}} required disabled={{this.uploading}} />
-                  <select name="asset_group" disabled={{this.uploading}}>
+              <form class="game-compendium-upload game-compendium-upload--batch" {{on "submit" this.uploadBatch}}>
+                <div class="game-compendium-upload__header">
+                  <h4>{{i18n "game_compendium.batch_upload"}}</h4>
+                  <p class="game-compendium-upload-hint">{{i18n "game_compendium.batch_upload_hint"}}</p>
+                </div>
+
+                <label class="game-compendium-filter game-compendium-upload__asset-group">
+                  <span>{{i18n "game_compendium.asset_group"}}</span>
+                  <select name="batch_asset_group" disabled={{this.uploading}}>
                     {{#each this.uploadAssetGroupOptions as |asset_group|}}<option value={{asset_group.slug}}>{{asset_group.name}}</option>{{/each}}
                   </select>
-                  <input name="file" type="file" accept="image/png" required disabled={{this.uploading}} />
-                </div>
-                <textarea name="description" placeholder={{i18n "game_compendium.description_placeholder"}} disabled={{this.uploading}}></textarea>
-                <DButton @label="game_compendium.upload_button" @isLoading={{this.uploading}} @disabled={{this.uploading}} @type="submit" class="btn-primary" />
-              </form>
+                  <small>{{i18n "game_compendium.batch_asset_group_hint"}}</small>
+                </label>
 
-              <form class="game-compendium-upload">
-                <h4>{{i18n "game_compendium.batch_upload"}}</h4>
-                <p class="game-compendium-upload-hint">{{i18n "game_compendium.batch_upload_hint"}}</p>
-                <select name="batch_asset_group" disabled={{this.uploading}}>
-                  {{#each this.uploadAssetGroupOptions as |asset_group|}}<option value={{asset_group.slug}}>{{asset_group.name}}</option>{{/each}}
-                </select>
-                <input type="file" accept="image/png" multiple disabled={{this.uploading}} {{on "change" this.uploadBatch}} />
+                <label class="game-compendium-batch-picker {{if this.batchDragActive "is-drag-active"}}" {{on "dragover" this.activateBatchDropZone}} {{on "dragleave" this.deactivateBatchDropZone}} {{on "drop" this.dropBatchFiles}}>
+                  <span class="game-compendium-batch-picker__title">{{i18n "game_compendium.choose_batch_files"}}</span>
+                  <span class="game-compendium-batch-picker__hint">{{i18n "game_compendium.choose_batch_files_hint"}}</span>
+                  <span class="btn btn-primary game-compendium-batch-picker__button">{{i18n "game_compendium.choose_files_button"}}</span>
+                  <input name="batch_files" type="file" accept="image/png,text/plain,.png,.txt" multiple disabled={{this.uploading}} {{on "change" this.selectBatchFiles}} />
+                </label>
+
+                {{#if this.hasBatchFiles}}
+                  <div class="game-compendium-batch-summary">
+                    <div class="game-compendium-batch-summary__counts">
+                      <span>{{i18n "game_compendium.batch_file_count" count=this.batchFiles.length}}</span>
+                      <span>{{i18n "game_compendium.batch_png_count" count=this.batchPngFileCount}}</span>
+                      <span>{{i18n "game_compendium.batch_text_count" count=this.batchTextFileCount}}</span>
+                    </div>
+                    <button type="button" class="btn-link" disabled={{this.uploading}} {{on "click" this.clearBatchFiles}}>{{i18n "game_compendium.clear_batch_files"}}</button>
+                  </div>
+
+                  <ul class="game-compendium-batch-file-list">
+                    {{#each this.batchFiles as |file|}}
+                      <li>{{file.name}}</li>
+                    {{/each}}
+                  </ul>
+                {{/if}}
+
+                <div class="game-compendium-upload__actions">
+                  <DButton @label="game_compendium.upload_button" @isLoading={{this.uploading}} @disabled={{if this.hasBatchFiles this.uploading true}} @type="submit" class="btn-primary" />
+                </div>
               </form>
             </section>
           {{/if}}

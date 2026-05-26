@@ -248,6 +248,31 @@ RSpec.describe "Game Compendium asset management", type: :request do
     )
   end
 
+  it "preserves png uploads that could be converted to jpeg" do
+    sign_in(Fabricate(:admin))
+    SiteSetting.png_to_jpg_quality = 1
+
+    post "/game-compendium/assets.json",
+         params: {
+           slug: "large transparent asset",
+           file:
+             upload_file(
+               name: "large_transparent_asset.png",
+               bytes:
+                 File.binread(
+                   Rails.root.join(
+                     "spec/fixtures/images/large_and_unoptimized.png"
+                   )
+                 )
+             )
+         }
+
+    expect(response.status).to eq(200)
+    asset = GameCompendium::Asset.find_by!(slug: "large_transparent_asset")
+    expect(asset.upload.extension).to eq("png")
+    expect(File.extname(asset.upload.url)).to eq(".png")
+  end
+
   it "batch uploads using filenames, one asset_group, and matching txt descriptions" do
     sign_in(Fabricate(:admin))
 

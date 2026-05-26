@@ -24,3 +24,23 @@ module GameCompendium
     end
   end
 end
+
+# == Schema Information
+#
+# Table name: game_compendium_assets
+#
+#  id             :bigint           not null, primary key
+#  description    :text             default(""), not null
+#  name           :string           not null
+#  slug           :string           not null
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  asset_group_id :bigint
+#  upload_id      :bigint           not null
+#
+# Indexes
+#
+#  index_game_compendium_assets_on_asset_group_id  (asset_group_id)
+#  index_game_compendium_assets_on_slug            (slug) UNIQUE
+#  index_game_compendium_assets_on_upload_id       (upload_id)
+#
